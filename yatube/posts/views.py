@@ -5,11 +5,12 @@ from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 
 POSTS_PER_PAGE = 10
+TEXT_LIMIT = 30
 
 
 def index(request):
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
@@ -22,7 +23,7 @@ def index(request):
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.groups.all()
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
@@ -37,7 +38,7 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.all()
     count = author.posts.count()
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
     context = {
@@ -53,22 +54,16 @@ def profile(request, username):
 
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
-    post_title = post.text[:30]
+    post_title = post.text[:TEXT_LIMIT]
     author = post.author
     author_posts = author.posts.all().count()
-    post = get_object_or_404(Post, pk=post_id)
     comments = post.comments.all()
     form = CommentForm()
     context = {
         "post": post,
-        "post_title": post_title,
-        "author": author,
-        "author_posts": author_posts,
-        "pub_date": post.pub_date,
         "comments": comments,
         "form": form
     }
-
     template = "posts/post_detail.html"
     return render(request, template, context)
 
@@ -84,7 +79,6 @@ def post_create(request):
         post.author = request.user
         post.save()
         return redirect(f"/profile/{post.author}/", {"form": form})
-    form = PostForm()
     groups = Group.objects.all()
     template = "posts/create_post.html"
     context = {"form": form, "groups": groups}
@@ -99,10 +93,9 @@ def post_edit(request, post_id):
         files=request.FILES or None,
         instance=post
     )
-    author = post.author
     groups = Group.objects.all()
     template = "posts/create_post.html"
-    if request.user == author:
+    if request.user == post.author:
         if form.is_valid():
             post = form.save()
             return redirect("posts:post_detail", post_id)
@@ -132,7 +125,7 @@ def follow_index(request):
     template = 'posts/follow.html'
     title = 'Публикации любимых авторов'
     posts = Post.objects.filter(author__following__user=request.user)
-    paginator = Paginator(posts, 10)
+    paginator = Paginator(posts, POSTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     context = {
