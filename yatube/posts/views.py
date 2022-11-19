@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 
 POSTS_PER_PAGE = 10
 
+
 def index(request):
     post_list = Post.objects.all()
     paginator = Paginator(post_list, 10)
@@ -69,7 +70,6 @@ def post_detail(request, post_id):
     }
 
     template = "posts/post_detail.html"
-
     return render(request, template, context)
 
 

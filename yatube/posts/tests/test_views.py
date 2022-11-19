@@ -168,7 +168,7 @@ class PostPagesTests(TestCase):
             reverse('posts:follow_index')
         )
         context_follow = response_follow.context
-        self.assertEqual(len(context_follow['page_obj']), 1)   
+        self.assertEqual(len(context_follow['page_obj']), 1)
 
     def test_unfollowing_posts(self):
         """Нет постов у неподписанного пользователя."""
