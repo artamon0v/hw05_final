@@ -56,11 +56,11 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     post_title = post.text[:TEXT_LIMIT]
     author = post.author
-    author_posts = author.posts.all().count()
     comments = post.comments.all()
     form = CommentForm()
     context = {
         "post": post,
+        "post_title": post_title,
         "comments": comments,
         "form": form
     }
