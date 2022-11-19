@@ -116,7 +116,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(response.context.get('post').group, self.post.group)
 
     def test_index_page_cache(self):
-        """Записи Index хранятся в кэше и обновлялся раз в 20 секунд"""
+        """Записи Index хранятся в кэше и обновлялся раз в 20 секунд."""
         response_1 = self.authorized_client.get(reverse('posts:index'))
         Post.objects.create(
             text='Тестовый текст для кэша',
@@ -145,7 +145,7 @@ class PostPagesTests(TestCase):
         self.assertEqual(follow.user, PostPagesTests.user)
 
     def test_unfollowing(self):
-        """Авторизованный пользователь может отписаться"""
+        """Тестирование отписки от автора."""
         Follow.objects.filter(
             user=PostPagesTests.user1,
             author=PostPagesTests.user).delete()
